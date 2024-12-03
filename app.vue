@@ -8,11 +8,16 @@
   const dogBreeds = useState("dogBreeds", () => []);
   const selectedBreed = useState("selectedBreed", () => "all breeds");
 
+  //void -> void
+  //MODIFIES: dogImageLink, dogBreeds
+  //EFFECTS: on initial render, fetch a random dog image and a list of all dog breeds
   onMounted(async () => {
     dogImageLink.value = await fetchDogImage();
     dogBreeds.value = await fetchDogBreeds();
   })
- 
+  
+  //void -> String
+  //EFFECTS: fetches a random dog image, of any species, using API.
   const fetchDogImage = async () => {
     try {
       const response = await $fetch(`${dogApiWebsite}/api/breeds/image/random`);
@@ -22,6 +27,8 @@
     }
   }
 
+  //String -> String
+  //EFFECTS: given a breed, fetches a random dog image of the given breed.
   const fetchDogImageFromBreed = async (breed) => {
     if (breed.toLowerCase() === "all breeds") {
       return await fetchDogImage();
@@ -45,10 +52,15 @@
     }
   }
 
+  //void -> void
+  //MODIFIES: dogImageLink
+  //EFFECTS: updates the dogImageLink state with a new image link. Asynchronous: uses API.
   const updateImage = async () => {
     dogImageLink.value = await fetchDogImageFromBreed(selectedBreed.value);
   }
 
+  //String -> String
+  //EFFECTS: given a sentence string, capitalize the first letter of each word in the string.
   const capitalizeWords = (sentence) => {
     return sentence
     .split(' ')
@@ -58,6 +70,11 @@
     .join(' ');
   }
 
+  //Object -> (listof String)
+  //EFFECTS: Given the response object from the fetchDogBreeds API call, produces a list of strings representing all species.
+  //The original response object (breedData) has fields representing the breed, and a list of describer words (e.g. in "golden retriever", "golden" is the describer word" and "retriever" is the breed).
+  //For each breed, add all combinations of "[describer word] [breed]" into the final list of breeds. E.g. "Kelpie Australian", "Shepherd Australian".
+  //If a given breed has no describer words given, return only the breed name. E.g. "Akita".
   const allBreedsListFromResponse = (breedData) => {
     const breedsList = [];
 
@@ -76,6 +93,8 @@
     return breedsList;
   }
 
+  //void -> Object
+  //EFFECTS: calls the dog.ceo API call to get all dog breeds. The response is an object with fields representing breed names, and values being a list of possible describer words for that breed.
   const fetchDogBreeds = async () => {
     try {
       const response = await $fetch(`${dogApiWebsite}/api/breeds/list/all`);
@@ -86,6 +105,9 @@
     }
   }
 
+  //void -> void
+  //MODIFIES: dogImageLink
+  //EFFECTS: limits how often updateImage is called. Multiple api calls within 200ms of each other are ignored.
   const debouncedUpdateImage = debounce(() => {
     updateImage();
   }, 200);
