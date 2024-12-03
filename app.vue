@@ -1,5 +1,6 @@
 <script setup lang="js">
-  import { onMounted } from 'vue'
+  import { onMounted } from "vue";
+  import { debounce } from "lodash";
 
   const dogApiWebsite = "https://dog.ceo";
 
@@ -34,8 +35,6 @@
         breedSecondWord = breed.split(' ')[1].toLowerCase();
       }
 
-      //console.log("first", breedFirstWord);
-
       const response = breedSecondWord ? 
                           await $fetch(`${dogApiWebsite}/api/breed/${breedSecondWord}/${breedFirstWord}/images/random`)
                         : 
@@ -47,8 +46,6 @@
   }
 
   const updateImage = async () => {
-    //dogImageLink.value = await fetchDogImage();
-
     dogImageLink.value = await fetchDogImageFromBreed(selectedBreed.value);
   }
 
@@ -85,9 +82,13 @@
       const allBreedsList = allBreedsListFromResponse(response.message);
       return allBreedsList;
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   }
+
+  const debouncedUpdateImage = debounce(() => {
+    updateImage();
+  }, 200);
 </script>
 
 <template>
@@ -105,7 +106,7 @@
           <option v-for="breed in dogBreeds" :value="breed">{{ capitalizeWords(breed) }}</option>
         </select> 
       </div>
-      <button v-on:click="updateImage" class="p-12 border border-black rounded-md bg-green-300 hover:bg-green-400 active:bg-green-500" type="button">Display a new dog image</button> 
+      <button v-on:click="debouncedUpdateImage" class="p-12 border border-black rounded-md bg-green-300 hover:bg-green-400 active:bg-green-500" type="button">Display a new dog image</button> 
     </div>
   </div>
 </template>
