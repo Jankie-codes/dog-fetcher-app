@@ -17,18 +17,19 @@
   })
   
   //void -> String
-  //EFFECTS: fetches a random dog image, of any species, using API.
+  //EFFECTS: fetches a random dog image (url link), of any breed, using API. If an error occurs, returns an "error occurred" image link.
   const fetchDogImage = async () => {
     try {
       const response = await $fetch(`${dogApiWebsite}/api/breeds/image/random`);
       return response.message;
     } catch (error) {
       console.error(error.message);
+      return "https://i.imgur.com/3d1sBhG.png";
     }
   }
 
   //String -> String
-  //EFFECTS: given a breed, fetches a random dog image of the given breed.
+  //EFFECTS: given a breed, fetches a random dog image (url link) of the given breed. If an error occurred, returns an "error occurred" image url link.
   const fetchDogImageFromBreed = async (breed) => {
     if (breed.toLowerCase() === "all breeds") {
       return await fetchDogImage();
@@ -49,6 +50,7 @@
       return response.message;
     } catch (error) {
       console.error(error.message);
+      return "https://i.imgur.com/3d1sBhG.png";
     }
   }
 
@@ -71,7 +73,7 @@
   }
 
   //Object -> (listof String)
-  //EFFECTS: Given the response object from the fetchDogBreeds API call, produces a list of strings representing all species.
+  //EFFECTS: Given the response object from the fetchDogBreeds API call, produces a list of strings representing all breeds.
   //The original response object (breedData) has fields representing the breed, and a list of describer words (e.g. in "golden retriever", "golden" is the describer word" and "retriever" is the breed).
   //For each breed, add all combinations of "[describer word] [breed]" into the final list of breeds. E.g. "Kelpie Australian", "Shepherd Australian".
   //If a given breed has no describer words given, return only the breed name. E.g. "Akita".
